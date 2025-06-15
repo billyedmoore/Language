@@ -47,12 +47,29 @@ class SimpleModelDataset(torch.utils.data.Dataset):
         char_dict[""] = 0
 
         self.char_to_i = char_dict
-        char_list = [None] * (max(char_dict.values()) + 1)
+        char_list : list[str] = ["TO_BE_POPULATED"] * (max(char_dict.values()) + 1)
 
         for c, i in char_dict.items():
             char_list[i] = c
 
+        assert "TO_BE_POPULATED" not in char_list
+
         self.i_to_char = char_list
+
+    def encode_input(self, input: str) -> torch.Tensor:
+        pad_length = self.input_length - len(input)
+        input_indexes = [0 for _ in range(pad_length)] + [self.char_to_i[c] for c in input]
+        index_tensor = torch.tensor(input_indexes, dtype=torch.int64)
+        input_tensor = torch.zeros(self.input_length,len(self.i_to_char))
+        input_tensor = input_tensor.scatter(1,index_tensor.unsqueeze(0),1)
+        return input_tensor.flatten()
+
+    def encode_target(self, target: str) -> torch.Tensor:
+        assert len(target) == 1
+        raw_label_tensor = torch.tensor([self.char_to_i[target]], dtype=torch.int64)
+        one_hot_label_tensor = torch.zeros(1,len(self.i_to_char))
+        one_hot_label_tensor = one_hot_label_tensor.scatter(1,raw_label_tensor.unsqueeze(1),1)
+        return one_hot_label_tensor.flatten()
 
     def __getitem__(self, idx):
         """
@@ -70,24 +87,21 @@ class SimpleModelDataset(torch.utils.data.Dataset):
 
         with open(self.file_name, "r") as f:
             f.seek(first_i)
-            input = f.read(given_input_length)
-            to_predict = f.read(1)
+            input_str = f.read(given_input_length)
+            label = f.read(1)
 
-        pad_length = self.input_length - given_input_length
+        input_tensor = self.encode_input(input_str)
+        label_tensor = self.encode_target(label)
 
-        input = [0 for _ in range(pad_length)] + [self.char_to_i[c] for c in input]
-        label = [self.char_to_i[to_predict]]
-        input_tensor = torch.tensor(input, dtype=torch.float)
-        label_tensor = torch.tensor(label, dtype=torch.float)
         return input_tensor, label_tensor
 
     def __len__(self):
         return self.number_of_samples
 
-    def output_to_char(self, output: torch.tensor) -> str:
+    def output_to_char(self, output: torch.Tensor) -> str:
         return self.i_to_char[int(output.cpu().tolist()[0])]
 
-    def input_to_str(self, input: torch.tensor) -> str:
+    def input_to_str(self, input: torch.Tensor) -> str:
         string = ""
         for i in input.cpu().tolist():
             string += self.i_to_char[int(i)]

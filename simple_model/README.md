@@ -2,16 +2,29 @@
 
 ## Idea
 
-+ Tokens represent characters as index's within a dictionary.
++ Tokens represent characters.
 + There is a special token for padding.
-+ Predict an output token.
++ Predict an output token from a series of input tokens.
 
-**Input**: list of *n* tokens.
-**Output**: predicted next token.
+**Input**: list of *n* one-hot encoded tokens.
+**Output**: one-hot encoded predicted next token (probablities).
 
 ## Input Data
 
-For testing and development I am using `The Poetical Works of William Wordsworth — Volume 3 (of 8) by William Wordsworth`
-from [Project GutenBerg](https://www.gutenberg.org/).
++ Input is a concatonated series of tokens of `n` length.
++ For each input we randomly sample the target character from the input text.
++ We randomly select a length of previous context to give `> 1` and `< n`. 
++ The previous context is padded out to `n` length 
++ Tokens are one-hot-encoded and concatonated into a 1d vector of `n*c` length where
+  `c` is the number of unique chars in the text.
 
-I will select random characters from the input text. I will then randomly choose a number of characters of context to give.
+## The Model
+
++ Simple NN with 2 linear layers.
++ `n*c -> [linear_1] -> (n*c)//2 -> [linear_2] -> c`
++ We use weighting to reduce the impact of more frequent characters (to prevent a case
+where the model only returned " ".
+
+## Conclusion
+
+The model struggles.
