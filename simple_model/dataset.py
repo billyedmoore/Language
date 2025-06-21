@@ -1,6 +1,7 @@
 import torch
 import random
 import os
+from pathlib import Path
 
 
 class SimpleModelDataset(torch.utils.data.Dataset):
@@ -9,7 +10,7 @@ class SimpleModelDataset(torch.utils.data.Dataset):
 
     def __init__(
         self,
-        file_name: str,
+        file_name: Path,
         number_of_samples: int,
         input_length: int,
         random_seed: int | None = None,
@@ -18,7 +19,7 @@ class SimpleModelDataset(torch.utils.data.Dataset):
         self._create_character_dictionary()
         self.random = random.Random(random_seed)
         self.number_of_samples = number_of_samples
-        self.file_length = os.path.getsize(file_name)  # only works as utf-8
+        self.file_length = os.path.getsize(file_name)
         self.input_length = input_length
 
         self.sample_input_length = [
@@ -47,7 +48,7 @@ class SimpleModelDataset(torch.utils.data.Dataset):
         char_dict[""] = 0
 
         self.char_to_i = char_dict
-        char_list : list[str] = ["TO_BE_POPULATED"] * (max(char_dict.values()) + 1)
+        char_list: list[str] = ["TO_BE_POPULATED"] * (max(char_dict.values()) + 1)
 
         for c, i in char_dict.items():
             char_list[i] = c
@@ -58,17 +59,21 @@ class SimpleModelDataset(torch.utils.data.Dataset):
 
     def encode_input(self, input: str) -> torch.Tensor:
         pad_length = self.input_length - len(input)
-        input_indexes = [0 for _ in range(pad_length)] + [self.char_to_i[c] for c in input]
+        input_indexes = [0 for _ in range(pad_length)] + [
+            self.char_to_i[c] for c in input
+        ]
         index_tensor = torch.tensor(input_indexes, dtype=torch.int64)
-        input_tensor = torch.zeros(self.input_length,len(self.i_to_char))
-        input_tensor = input_tensor.scatter(1,index_tensor.unsqueeze(0),1)
+        input_tensor = torch.zeros(self.input_length, len(self.i_to_char))
+        input_tensor = input_tensor.scatter(1, index_tensor.unsqueeze(0), 1)
         return input_tensor.flatten()
 
     def encode_target(self, target: str) -> torch.Tensor:
         assert len(target) == 1
         raw_label_tensor = torch.tensor([self.char_to_i[target]], dtype=torch.int64)
-        one_hot_label_tensor = torch.zeros(1,len(self.i_to_char))
-        one_hot_label_tensor = one_hot_label_tensor.scatter(1,raw_label_tensor.unsqueeze(1),1)
+        one_hot_label_tensor = torch.zeros(1, len(self.i_to_char))
+        one_hot_label_tensor = one_hot_label_tensor.scatter(
+            1, raw_label_tensor.unsqueeze(1), 1
+        )
         return one_hot_label_tensor.flatten()
 
     def __getitem__(self, idx):

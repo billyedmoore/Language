@@ -1,14 +1,17 @@
 import os
 import re
 from collections import Counter
-from .model_utils import get_frequencies
+from simple_model.model_utils import get_frequencies
+from pathlib import Path
+
+CHUNK_SIZE = 1024
 
 
-def prepare_input(input_filename: str, output_filename: str, minimum_freq: int = 100):
+def prepare_input(input_filename: Path, output_filename: Path, minimum_freq: int = 100):
     """
     Remove infrequent characters from file {input_filename} and save result to {output_filename}.
     """
-    if not os.path.exists(input_filename):
+    if not input_filename.exists():
         raise FileNotFoundError(f"Input file {input_filename} does not exist.")
 
     char_freq = get_frequencies(input_filename)
@@ -37,5 +40,3 @@ def prepare_input(input_filename: str, output_filename: str, minimum_freq: int =
                 output_f.write(
                     "".join([c for c in chunk.lower() if c not in chars_to_remove])
                 )
-
-    print(_get_frequencies(output_filename))

@@ -1,10 +1,9 @@
-import torch
 import random
-from dataset import SimpleModelDataset
-#from model import SimpleModel
 from collections import Counter
+from pathlib import Path
 
-def get_frequencies(input_filename: str) -> dict[str,int]:
+
+def get_frequencies(input_filename: Path) -> dict[str, int]:
     char_freq = Counter()
 
     with open(input_filename, "r") as f:
@@ -17,19 +16,20 @@ def get_frequencies(input_filename: str) -> dict[str,int]:
             char_freq.update(chunk.lower())
     return dict(char_freq)
 
-def predict_next_char(model, dataset, input: str): 
+
+def predict_next_char(model, dataset, input: str):
     input_tensor = dataset.encode_input(input).unsqueeze(0)
     probabilites = model(input_tensor).tolist()[0]
 
     print(probabilites)
-    
+
     char = ""
     # If we are predicting a placeholder
     while char == "":
-        selected = random.choices([i for i in range(len(probabilites))],weights=probabilites,k=1)
+        selected = random.choices(
+            [i for i in range(len(probabilites))], weights=probabilites, k=1
+        )
         char = dataset.i_to_char[selected[0]]
-    
+
     print(char)
     return char
-
-
