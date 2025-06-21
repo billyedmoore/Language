@@ -40,5 +40,3 @@ def prepare_input(input_filename: Path, output_filename: Path, minimum_freq: int
                 output_f.write(
                     "".join([c for c in chunk.lower() if c not in chars_to_remove])
                 )
-
-    print(_get_frequencies(output_filename))
