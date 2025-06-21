@@ -1,7 +1,7 @@
-from dataset import SimpleModelDataset
-from model import SimpleModel, train
-from prepare_input import prepare_input
-from model_utils import predict_next_char 
+from .dataset import SimpleModelDataset
+from .model import SimpleModel, train
+from .model_utils import predict_next_char 
+from data_prep import prepare_input
 import datetime
 import os
 import torch
