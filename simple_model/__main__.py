@@ -3,8 +3,6 @@ from .model import SimpleModel, train
 from .model_utils import predict_next_char
 from data_prep import prepare_input
 from pathlib import Path
-import datetime
-import os
 import torch
 
 
@@ -18,8 +16,10 @@ def main(input_length):
     if not prepared_input.exists():
         prepare_input(input_file, prepared_input)
 
-    train_data = SimpleModelDataset(prepared_input, 1000, input_length, random_seed=913)
-    eval_data = SimpleModelDataset(prepared_input, 100, input_length, random_seed=340)
+    train_data = SimpleModelDataset(
+        prepared_input, 10000, input_length, random_seed=913
+    )
+    eval_data = SimpleModelDataset(prepared_input, 1000, input_length, random_seed=340)
 
     model = SimpleModel(input_length, len(train_data.i_to_char))
     train(model, train_data, eval_data, num_epochs=20)

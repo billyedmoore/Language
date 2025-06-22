@@ -12,7 +12,6 @@ class SimpleModel(torch.nn.Module):
         self.relu1 = torch.nn.ReLU()
         self.linear2 = torch.nn.Linear(input_size // 2, numb_categories)
         self.relu2 = torch.nn.ReLU()
-        self.softmax = torch.nn.Softmax(dim=1)
 
     def forward(self, x):
         x = self.linear1(x)
@@ -68,12 +67,11 @@ def train(
         shuffle=True,
     )
 
-    # TODO: class_weights
-    train_weights = _char_frequency_to_class_weights(
-        get_frequencies(train_dataset.file_name), train_dataset.char_to_i
-    )
-    criterion = torch.nn.CrossEntropyLoss(weight=train_weights)
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+    # train_weights = _char_frequency_to_class_weights(
+    #    get_frequencies(train_dataset.file_name), train_dataset.char_to_i
+    # )
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.05)
 
     for epoch in range(num_epochs):
         train_loss = 0

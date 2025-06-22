@@ -69,12 +69,13 @@ class SimpleModelDataset(torch.utils.data.Dataset):
 
     def encode_target(self, target: str) -> torch.Tensor:
         assert len(target) == 1
-        raw_label_tensor = torch.tensor([self.char_to_i[target]], dtype=torch.int64)
-        one_hot_label_tensor = torch.zeros(1, len(self.i_to_char))
-        one_hot_label_tensor = one_hot_label_tensor.scatter(
-            1, raw_label_tensor.unsqueeze(1), 1
-        )
-        return one_hot_label_tensor.flatten()
+        raw_label_tensor = torch.tensor(self.char_to_i[target], dtype=torch.int64)
+        return raw_label_tensor
+        # one_hot_label_tensor = torch.zeros(1, len(self.i_to_char))
+        # one_hot_label_tensor = one_hot_label_tensor.scatter(
+        #    1, raw_label_tensor.unsqueeze(1), 1
+        # )
+        # one_hot_label_tensor.flatten()
 
     def __getitem__(self, idx):
         """
