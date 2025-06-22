@@ -1,6 +1,7 @@
 import random
 from collections import Counter
 from pathlib import Path
+import torch
 
 
 def get_frequencies(input_filename: Path) -> dict[str, int]:
@@ -18,8 +19,8 @@ def get_frequencies(input_filename: Path) -> dict[str, int]:
 
 
 def predict_next_char(model, dataset, input: str):
-    input_tensor = dataset.encode_input(input).unsqueeze(0)
-    probabilites = model(input_tensor).tolist()[0]
+    input_tensor: torch.Tensor = dataset.encode_input(input).unsqueeze(0)
+    probabilites = torch.softmax(model(input_tensor), dim=1).tolist()[0]
 
     print(probabilites)
 

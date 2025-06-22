@@ -19,7 +19,7 @@ class SimpleModel(torch.nn.Module):
         x = self.relu1(x)
         x = self.linear2(x)
         x = self.relu2(x)
-        return self.softmax(x)
+        return x
 
 
 def _char_frequency_to_class_weights(
