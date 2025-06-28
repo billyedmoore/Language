@@ -39,7 +39,7 @@ def train(
     )
 
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     for epoch in range(num_epochs):
         train_loss = 0
@@ -64,7 +64,8 @@ def train(
         print(
             f"Epoch [{epoch + 1}/{num_epochs}], "
             f"Train Loss: {train_loss / len(train_loader):.4f}, "
-            f"Validation Loss: {eval_loss / len(eval_loader):.4f}"
+            f"Validation Loss: {eval_loss / len(eval_loader):.5f}, "
+            f"Learning Rate: {optimizer.param_groups[0]['lr']}"
         )
 
 

@@ -20,7 +20,7 @@ def main(input_length):
     dataset = RNNDataset(prepared_input, 10000, input_length, random_seed=913)
 
     model = RNNModel(len(dataset.i_to_char), 128)
-    train(model, dataset, num_epochs=100, learning_rate=0.01)
+    train(model, dataset, num_epochs=100, learning_rate=0.001)
 
     start = "to be or "
     print(repr(generate_text(model, start, 30, dataset)))
