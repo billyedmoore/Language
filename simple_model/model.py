@@ -52,19 +52,23 @@ def _char_frequency_to_class_weights(
 
 def train(
     model: torch.nn.Module,
-    train_dataset: SimpleModelDataset,
-    eval_dataset: SimpleModelDataset,
+    dataset: SimpleModelDataset,
+    device: torch.device,
     num_epochs: int = 1000,
 ):
+    print(device)
+    train_dataset, eval_dataset = torch.utils.data.random_split(
+        dataset, [0.8, 0.2], generator=torch.Generator(device=device)
+    )
+
     train_loader = torch.utils.data.DataLoader(
-        train_dataset,
-        batch_size=16,
-        shuffle=True,
+        train_dataset, batch_size=16, generator=torch.Generator(device=device)
     )
     eval_loader = torch.utils.data.DataLoader(
         eval_dataset,
         batch_size=16,
         shuffle=True,
+        generator=torch.Generator(device=device),
     )
 
     # train_weights = _char_frequency_to_class_weights(

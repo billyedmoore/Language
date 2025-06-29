@@ -7,7 +7,7 @@ from pathlib import Path
 import torch
 
 
-def main(input_length):
+def main(input_length, device):
     simple_filename = "shakespeare"
     file_path = Path(__file__).resolve().parent.parent
     data_folder = file_path.joinpath("data")
@@ -17,10 +17,11 @@ def main(input_length):
     if not prepared_input.exists():
         prepare_input(input_file, prepared_input)
 
-    dataset = RNNDataset(prepared_input, 10000, input_length, random_seed=913)
+    dataset = RNNDataset(prepared_input, 10000, input_length, device, random_seed=913)
 
     model = RNNModel(len(dataset.i_to_char), 128)
-    train(model, dataset, num_epochs=100, learning_rate=0.001)
+    model.to(device)
+    train(model, dataset, device, num_epochs=1, learning_rate=0.001)
 
     start = "to be or "
     print(repr(generate_text(model, start, 30, dataset)))
@@ -33,4 +34,4 @@ if __name__ == "__main__":
     else:
         device = torch.device("cpu")
         print("CUDA not available, using CPU.")
-    main(200)
+    main(200, device)

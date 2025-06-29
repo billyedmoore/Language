@@ -22,20 +22,25 @@ class RNNModel(torch.nn.Module):
 def train(
     model: RNNModel,
     dataset: RNNDataset,
+    device: torch.device,
     num_epochs: int = 100,
     learning_rate: float = 0.01,
 ):
-    train_dataset, eval_dataset = torch.utils.data.random_split(dataset, [0.8, 0.2])
+    train_dataset, eval_dataset = torch.utils.data.random_split(
+        dataset, [0.8, 0.2], generator=torch.Generator(device=device)
+    )
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
         batch_size=16,
         shuffle=True,
+        generator=torch.Generator(device=device),
     )
     eval_loader = torch.utils.data.DataLoader(
         eval_dataset,
         batch_size=16,
         shuffle=True,
+        generator=torch.Generator(device=device),
     )
 
     criterion = torch.nn.CrossEntropyLoss()

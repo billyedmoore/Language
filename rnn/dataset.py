@@ -13,6 +13,7 @@ class RNNDataset(torch.utils.data.Dataset):
         file_name: Path,
         number_of_samples: int,
         input_length: int,
+        device: torch.device,
         random_seed: int | None = None,
     ):
         self.file_name = file_name
@@ -21,6 +22,7 @@ class RNNDataset(torch.utils.data.Dataset):
         self.number_of_samples = number_of_samples
         self.file_length = os.path.getsize(file_name)
         self.input_length = input_length
+        self.device = device
 
         self.start_indexes = [
             self.random.randint(3, self.file_length) for _ in range(number_of_samples)
@@ -55,14 +57,18 @@ class RNNDataset(torch.utils.data.Dataset):
 
     def encode_input(self, input: str) -> torch.Tensor:
         input_indexes = [self.char_to_i[c] for c in input]
-        index_tensor = torch.tensor(input_indexes, dtype=torch.int64)
-        input_tensor = torch.zeros(self.input_length, len(self.i_to_char))
+        index_tensor = torch.tensor(
+            input_indexes, dtype=torch.int64, device=self.device
+        )
+        input_tensor = torch.zeros(
+            self.input_length, len(self.i_to_char), device=self.device
+        )
         input_tensor = input_tensor.scatter(1, index_tensor.unsqueeze(1), 1)
         return input_tensor
 
     def _encode_target(self, target: str) -> torch.Tensor:
         raw_label_tensor = torch.tensor(
-            [self.char_to_i[c] for c in target], dtype=torch.int64
+            [self.char_to_i[c] for c in target], dtype=torch.int64, device=self.device
         )
         return raw_label_tensor
 
