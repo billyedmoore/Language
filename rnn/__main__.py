@@ -2,7 +2,7 @@ from .dataset import RNNDataset
 from .model import RNNModel, train, generate_text
 
 # from .model_utils import predict_next_char
-from data_prep import prepare_input
+from common.data_prep import prepare_input
 from pathlib import Path
 import torch
 
