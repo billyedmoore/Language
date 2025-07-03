@@ -25,7 +25,8 @@ class RNNDataset(torch.utils.data.Dataset):
         self.device = device
 
         self.start_indexes = [
-            self.random.randint(3, self.file_length) for _ in range(number_of_samples)
+            self.random.randint(0, self.file_length - self.input_length)
+            for _ in range(number_of_samples)
         ]
 
     def _create_character_dictionary(self):

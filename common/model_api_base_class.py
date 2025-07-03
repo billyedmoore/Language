@@ -2,7 +2,7 @@ class ModelAPIBaseClass:
     def load(self, model_path: str):
         raise NotImplementedError()
 
-    def save(self, model_path: str):
+    def save(self, save_path: str):
         raise NotImplementedError()
 
     def train(self, number_of_epochs: int, learning_rate: float):

@@ -15,8 +15,8 @@ class RNNModel(torch.nn.Module):
         x = self.linear(x.reshape(-1, self.hidden_size))
         return x, hidden_state
 
-    def create_hidden(self, batch_size: int):
-        return torch.zeros(1, batch_size, self.hidden_size)
+    def create_hidden(self, batch_size: int, device: torch.device):
+        return torch.zeros(1, batch_size, self.hidden_size, device=device)
 
 
 def train(
@@ -26,21 +26,17 @@ def train(
     num_epochs: int = 100,
     learning_rate: float = 0.01,
 ):
-    train_dataset, eval_dataset = torch.utils.data.random_split(
-        dataset, [0.8, 0.2], generator=torch.Generator(device=device)
-    )
+    train_dataset, eval_dataset = torch.utils.data.random_split(dataset, [0.8, 0.2])
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
         batch_size=16,
         shuffle=True,
-        generator=torch.Generator(device=device),
     )
     eval_loader = torch.utils.data.DataLoader(
         eval_dataset,
         batch_size=16,
         shuffle=True,
-        generator=torch.Generator(device=device),
     )
 
     criterion = torch.nn.CrossEntropyLoss()
@@ -49,7 +45,7 @@ def train(
     for epoch in range(num_epochs):
         train_loss = 0
         for _, (inputs, targets) in enumerate(train_loader):
-            hidden = model.create_hidden(inputs.size(0))
+            hidden = model.create_hidden(inputs.size(0), device)
             optimizer.zero_grad()
             outputs, hidden = model(inputs, hidden)
             loss = criterion(outputs, targets.view(-1))
@@ -61,7 +57,7 @@ def train(
         eval_loss = 0.0
         with torch.no_grad():
             for _, (inputs, targets) in enumerate(eval_loader):
-                hidden = model.create_hidden(inputs.size(0))
+                hidden = model.create_hidden(inputs.size(0), device)
                 outputs, hidden = model(inputs, hidden)
                 loss = criterion(outputs, targets.view(-1))
                 eval_loss += loss.item() * inputs.size(0)
@@ -75,10 +71,14 @@ def train(
 
 
 def generate_text(
-    model: RNNModel, input_str: str, length_to_add: int, dataset: RNNDataset
+    model: RNNModel,
+    input_str: str,
+    length_to_add: int,
+    dataset: RNNDataset,
+    device: torch.device,
 ):
     model.eval()
-    hidden = model.create_hidden(1)
+    hidden = model.create_hidden(1, device)
 
     generated_text = input_str
 

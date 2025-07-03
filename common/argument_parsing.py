@@ -13,7 +13,7 @@ def execute_by_arguments(args: argparse.Namespace, model: ModelAPIBaseClass):
             model.save(args.save_path)
         case "generate":
             model.load(args.model_path)
-            model.generate_text(args.input_text)
+            print(repr(model.generate_text(args.input_text)))
         case _:
             raise ValueError("Unknown command")
 
@@ -48,7 +48,7 @@ def get_argparser(model_description: str):
         type=str,
         required=True,
         dest="save_path",
-        help="Optional: Output file path for the trained model, by default model is not saved.",
+        help="Required: Output file path for the trained model.",
     )
 
     generate_parser = subparsers.add_parser("generate")
