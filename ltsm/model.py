@@ -1,13 +1,17 @@
 import torch
+import io 
 from rnn.dataset import RNNDataset
+from common.early_stopping import stop_early_naive
 import random
 
 
 class LTSMmodel(torch.nn.Module):
     def __init__(self, numb_categories: int, hidden_size: int):
         super(LTSMmodel, self).__init__()
+        self.number_lstm_layers = 1
         self.hidden_size = hidden_size
-        self.lstm = torch.nn.LSTM(numb_categories, hidden_size, 1, batch_first=True)
+        self.lstm = torch.nn.LSTM(numb_categories, hidden_size, 
+                                  self.number_lstm_layers, batch_first=True)
         self.linear = torch.nn.Linear(hidden_size, numb_categories)
 
     def forward(self, x, hidden_state, cell_state):
@@ -16,7 +20,8 @@ class LTSMmodel(torch.nn.Module):
         return x, (hidden_state, cell_state)
 
     def create_state_layer(self, batch_size: int, device: torch.device):
-        return torch.zeros(1, batch_size, self.hidden_size, device=device)
+        return torch.zeros(self.number_lstm_layers,
+                           batch_size, self.hidden_size, device=device)
 
 
 def train(
@@ -44,6 +49,7 @@ def train(
 
     train_losses = []
     eval_losses = []
+    checkpoints = []
 
     for epoch in range(num_epochs):
         train_loss = 0
@@ -70,12 +76,24 @@ def train(
 
         train_losses.append(train_loss)
         eval_losses.append(eval_loss)
+        torch.save(model, "temp") 
+        checkpoints.append("temp")
+
 
         print(
             f"Epoch [{epoch + 1}/{num_epochs}], "
             f"Train Loss: {train_loss / len(train_loader):.4f}, "
             f"Validation Loss: {eval_loss / len(eval_loader):.5f}, "
         )
+
+        if stop_early_naive(eval_losses):
+            print(f"Stopping Early at Epoch {epoch+1}")
+            i = eval_losses.index(max(eval_losses))
+            from_checkpoint = torch.load(checkpoints[i],weights_only=False)
+            model.load_state_dict(from_checkpoint.state_dict())
+            print(f"Restoring To Epoch {epoch+1}")
+            
+            break
 
 
 def generate_text(

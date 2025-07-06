@@ -4,9 +4,9 @@ from common.argument_parsing import get_argparser, execute_by_arguments
 from common.get_torch_device import get_torch_device
 
 
-def main(input_length, device, dataset_size):
+def main(input_length, device, dataset_size, hidden_layer_size):
     api = LTSMAPI(
-        device, input_length, "shakespeare", dataset_size, hidden_layer_size=512
+        device, input_length, "Emma", dataset_size, hidden_layer_size=hidden_layer_size
     )
     parser = get_argparser("LTSM Model")
     args = parser.parse_args()
@@ -14,4 +14,4 @@ def main(input_length, device, dataset_size):
 
 
 if __name__ == "__main__":
-    main(2000, get_torch_device(silent=True), 10000)
+    main(1000, get_torch_device(silent=True), 10000, 256)
