@@ -5,7 +5,9 @@ class ModelAPIBaseClass:
     def save(self, save_path: str):
         raise NotImplementedError()
 
-    def train(self, number_of_epochs: int, learning_rate: float):
+    def train(
+        self, number_of_epochs: int, learning_rate: float, early_stopping: bool = True
+    ):
         raise NotImplementedError()
 
     def generate_text(self, input: str):

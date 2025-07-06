@@ -25,7 +25,9 @@ def train(
     device: torch.device,
     num_epochs: int = 100,
     learning_rate: float = 0.01,
+    early_stopping: bool = True,
 ):
+    print("NOTE: Early stopping not implemented for RNN.")
     train_dataset, eval_dataset = torch.utils.data.random_split(dataset, [0.8, 0.2])
 
     train_loader = torch.utils.data.DataLoader(

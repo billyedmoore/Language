@@ -65,7 +65,9 @@ class RNNAPI(ModelAPIBaseClass):
 
         torch.save(self.model.state_dict(), save_path)
 
-    def train(self, number_of_epochs: int, learning_rate: float):
+    def train(
+        self, number_of_epochs: int, learning_rate: float, early_stopping: bool = True
+    ):
 
         if self.dataset is None:
             self._load_dataset()
