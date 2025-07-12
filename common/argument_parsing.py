@@ -9,7 +9,9 @@ def execute_by_arguments(args: argparse.Namespace, model: ModelAPIBaseClass):
     """
     match args.command:
         case "train":
-            model.train(args.num_epochs, args.learning_rate)
+            model.train(
+                args.num_epochs, args.learning_rate, early_stopping=args.early_stopping
+            )
             model.save(args.save_path)
         case "generate":
             model.load(args.model_path)
@@ -49,6 +51,14 @@ def get_argparser(model_description: str):
         required=True,
         dest="save_path",
         help="Required: Output file path for the trained model.",
+    )
+
+    train_parser.add_argument(
+        "--early-stopping",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        dest="early_stopping",
+        help="Optional: Disable or enable the use of early stopping. Default -> True.",
     )
 
     generate_parser = subparsers.add_parser("generate")

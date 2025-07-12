@@ -1,15 +1,15 @@
 from common.model_api_base_class import ModelAPIBaseClass
 from common.data_prep import prepare_input
 
-from .model import RNNModel, generate_text, train
-from .dataset import RNNDataset
+from .model import LTSMmodel, generate_text, train
+from rnn.dataset import RNNDataset
 import torch
 
 from pathlib import Path
 
 
-class RNNAPI(ModelAPIBaseClass):
-    model: RNNModel | None = None
+class LTSMAPI(ModelAPIBaseClass):
+    model: LTSMmodel | None = None
     dataset: RNNDataset | None = None
     device: torch.device
 
@@ -19,12 +19,14 @@ class RNNAPI(ModelAPIBaseClass):
         input_length: int,
         input_filename: str,
         dataset_size: int,
+        hidden_layer_size: int = 128,
     ):
         self.device = device
         self.dataset = None
         self.input_length = input_length
         self.input_filename = input_filename
         self.dataset_size = dataset_size
+        self.hidden_layer_size = hidden_layer_size
 
     def _load_dataset(self):
         simple_filename = self.input_filename
@@ -49,7 +51,7 @@ class RNNAPI(ModelAPIBaseClass):
 
         assert self.dataset is not None
 
-        self.model = RNNModel(len(self.dataset.i_to_char), 128)
+        self.model = LTSMmodel(len(self.dataset.i_to_char), self.hidden_layer_size)
         self.model.to(self.device)
 
     def load(self, model_path: str):
@@ -84,6 +86,7 @@ class RNNAPI(ModelAPIBaseClass):
             self.device,
             num_epochs=number_of_epochs,
             learning_rate=learning_rate,
+            early_stopping=early_stopping,
         )
 
     def generate_text(self, input: str):
