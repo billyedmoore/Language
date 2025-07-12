@@ -23,11 +23,20 @@ class RNNDataset(torch.utils.data.Dataset):
         self.file_length = os.path.getsize(file_name)
         self.input_length = input_length
         self.device = device
+    
+        first_offset = self.random.randint(0,self.input_length-1)
+        max_start_index = self.file_length-self.input_length-first_offset
 
-        self.start_indexes = [
-            self.random.randint(0, self.file_length - self.input_length)
-            for _ in range(number_of_samples)
-        ]
+        self.start_indexes = list(range(first_offset, max_start_index, self.input_length))
+
+        max_n_samples = len(self.start_indexes)
+
+        if self.number_of_samples <= max_n_samples:
+            print(self.number_of_samples, max_n_samples)
+            self.start_indexes = self.random.sample(self.start_indexes,self.number_of_samples)
+        else:
+            raise ValueError(f"Text too short to support {self.number_of_samples} samples, can only provide {max_n_samples}")
+
 
     def _create_character_dictionary(self):
         """
