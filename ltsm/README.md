@@ -1,6 +1,6 @@
 # LTSM (Long Short-term Memory)
 
-LTSM is a kind of RNN with a more complex structure.
+LTSM is a kind of RNN with a more complex structure better suited to long-term memory.
 
 ## Idea
 
@@ -8,8 +8,8 @@ LTSM is a kind of RNN with a more complex structure.
 + Predict an output token from a single input token.
 + Context is stored in a hidden layer, so prediction includes context from the previous tokens.
 
-**Input**: one-hot encoded token and a hidden layer.
-**Output**: predicted next tokens (probabilities) and an updated hidden layer.
+**Input**: one-hot encoded token and two context layers hidden layer and cell layer.
+**Output**: predicted next tokens (probabilities) and an updated hidden and cell layer.
 
 ## Input Data
 
@@ -18,10 +18,6 @@ LTSM is a kind of RNN with a more complex structure.
 
 ## The Model
 
-+ Simple RNN with a single linear layer.
-+ Hidden layer is of an arbitrary size.
++ LTSM with one layer and a single linear layer.
++ Hidden layer and cell layer are of (the same) arbitrary size.
 
-## Conclusion
-
-Performs much better than the naive linear approach, even producing something that kind of looks like words. 
-If you ignore the full-stops that is.
