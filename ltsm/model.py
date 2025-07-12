@@ -78,8 +78,7 @@ def train(
 
         train_losses.append(train_loss)
         eval_losses.append(eval_loss)
-        torch.save(model, "temp")
-        checkpoints.append("temp")
+        checkpoints.append(model.state_dict())
 
         print(
             f"Epoch [{epoch + 1}/{num_epochs}], "
@@ -89,9 +88,8 @@ def train(
 
         if stop_early_naive(eval_losses) and early_stopping:
             print(f"Stopping Early at Epoch {epoch+1}")
-            i = eval_losses.index(max(eval_losses))
-            from_checkpoint = torch.load(checkpoints[i], weights_only=False)
-            model.load_state_dict(from_checkpoint.state_dict())
+            i = eval_losses.index(min(eval_losses))
+            model.load_state_dict(checkpoints[i])
             print(f"Restoring To Epoch {epoch+1}")
 
             break

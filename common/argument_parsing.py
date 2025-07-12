@@ -56,6 +56,7 @@ def get_argparser(model_description: str):
     train_parser.add_argument(
         "--early-stopping",
         action=argparse.BooleanOptionalAction,
+        default=True,
         dest="early_stopping",
         help="Optional: Disable or enable the use of early stopping. Default -> True.",
     )
